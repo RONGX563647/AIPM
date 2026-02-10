@@ -26,24 +26,17 @@ export interface TaskPageResponse {
   pages: number
 }
 
-export interface TaskProgressResponse {
-  projectId: number
-  progress: number
-  total: number
-  completed: number
-}
-
 export const taskApi = {
   add: (data: Task) => {
-    return api.post('/task', data)
+    return api.post('/task/add', data)
   },
 
   update: (data: Task) => {
-    return api.put('/task', data)
+    return api.put('/task/update', data)
   },
 
   delete: (id: number) => {
-    return api.delete(`/task/${id}`)
+    return api.delete(`/task/delete/${id}`)
   },
 
   page: (params: TaskPageRequest) => {
@@ -55,6 +48,6 @@ export const taskApi = {
   },
 
   getProgress: (projectId: number) => {
-    return api.get<TaskProgressResponse>(`/task/progress/${projectId}`)
+    return api.get<number>(`/task/progress/${projectId}`)
   }
 }

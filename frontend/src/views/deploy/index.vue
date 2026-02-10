@@ -318,7 +318,8 @@ const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除该部署记录吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     try {
       await deployApi.delete(row.id)

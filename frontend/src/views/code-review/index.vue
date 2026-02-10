@@ -284,7 +284,8 @@ const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除该评审记录吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     try {
       await codeReviewApi.delete(row.id)

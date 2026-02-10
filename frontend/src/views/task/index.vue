@@ -227,8 +227,8 @@ const getPriorityText = (priority) => {
 const fetchProgress = async () => {
   try {
     const res = await taskApi.getProgress(formData.projectId)
-    if (res.code === 200) {
-      projectProgress.value = res.data.progress
+    if (res.code === 0) {
+      projectProgress.value = res.data
     }
   } catch (error) {
     console.error('获取项目进度失败', error)
@@ -243,7 +243,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize,
       projectId: formData.projectId
     })
-    if (res.code === 200) {
+    if (res.code === 0) {
       tableData.value = res.data.records
       pagination.total = res.data.total
     }
@@ -270,7 +270,8 @@ const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除该任务吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     try {
       await taskApi.delete(row.id)

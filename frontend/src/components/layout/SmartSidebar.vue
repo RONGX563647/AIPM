@@ -239,7 +239,8 @@ const handleLogout = () => {
   ElMessageBox.confirm('确定要退出登录吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    confirmButtonClass: 'el-button--danger'
   }).then(() => {
     userStore.logout()
     ElMessage.success('退出登录成功')

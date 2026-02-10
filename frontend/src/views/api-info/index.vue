@@ -239,7 +239,8 @@ const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除该接口吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     try {
       await apiInfoApi.delete(row.id)

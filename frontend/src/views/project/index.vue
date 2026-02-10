@@ -370,6 +370,7 @@ const handleDelete = (row) => {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
+    confirmButtonClass: "el-button--danger"
   })
     .then(async () => {
       try {

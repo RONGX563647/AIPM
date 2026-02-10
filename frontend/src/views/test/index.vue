@@ -330,7 +330,8 @@ const handleDeleteCase = (row) => {
   ElMessageBox.confirm('确定要删除该测试用例吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    confirmButtonClass: 'el-button--danger'
   }).then(async () => {
     loading.value = true
     try {
