@@ -53,7 +53,7 @@
           stripe
           class="api-table"
         >
-          <el-table-column prop="path" label="接口路径" min-width="200" />
+          <el-table-column prop="path" label="接口路径" min-width="200" show-overflow-tooltip />
           <el-table-column prop="method" label="请求方法" width="100">
             <template #default="{ row }">
               <el-tag :type="getMethodType(row.method)" size="small">
@@ -61,10 +61,24 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="params" label="请求参数" min-width="300" show-overflow-tooltip />
-          <el-table-column prop="createTime" label="创建时间" width="180" />
-          <el-table-column label="操作" width="200" fixed="right">
+          <el-table-column prop="remark" label="备注" min-width="150" show-overflow-tooltip />
+          <el-table-column prop="createTime" label="创建时间" width="120">
             <template #default="{ row }">
+              <span v-if="row.createTime">{{ formatDate(row.createTime) }}</span>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="250" fixed="right">
+            <template #default="{ row }">
+              <el-button
+                type="primary"
+                link
+                @click="handleDebug(row)"
+                class="action-button"
+              >
+                <el-icon><VideoPlay /></el-icon>
+                调试
+              </el-button>
               <el-button
                 type="primary"
                 link
@@ -127,8 +141,24 @@
           <el-input
             v-model="formData.params"
             type="textarea"
-            :rows="8"
+            :rows="6"
             placeholder='请输入请求参数（JSON格式），如：{"username": "string", "password": "string"}'
+          />
+        </el-form-item>
+        <el-form-item label="请求头" prop="header">
+          <el-input
+            v-model="formData.header"
+            type="textarea"
+            :rows="4"
+            placeholder='请输入请求头（JSON格式），如：{"Authorization": "Bearer token"}'
+          />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input
+            v-model="formData.remark"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入接口备注"
           />
         </el-form-item>
       </el-form>
@@ -137,13 +167,82 @@
         <el-button type="primary" @click="handleSubmit" class="gold-button">确定</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="debugDialogVisible"
+      title="在线调试"
+      width="900px"
+      class="debug-dialog"
+    >
+      <el-form
+        ref="debugFormRef"
+        :model="debugForm"
+        label-width="100px"
+      >
+        <el-form-item label="接口路径">
+          <el-input v-model="debugForm.path" placeholder="请输入接口路径" />
+        </el-form-item>
+        <el-form-item label="请求方法">
+          <el-select v-model="debugForm.method" placeholder="请选择请求方法" style="width: 100%">
+            <el-option label="GET" value="GET" />
+            <el-option label="POST" value="POST" />
+            <el-option label="PUT" value="PUT" />
+            <el-option label="DELETE" value="DELETE" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="请求参数">
+          <el-input
+            v-model="debugForm.params"
+            type="textarea"
+            :rows="6"
+            placeholder='请输入请求参数（JSON格式）'
+          />
+        </el-form-item>
+        <el-form-item label="请求头">
+          <el-input
+            v-model="debugForm.header"
+            type="textarea"
+            :rows="4"
+            placeholder='请输入请求头（JSON格式）'
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="debugDialogVisible = false" class="cancel-button">取消</el-button>
+        <el-button type="primary" @click="handleSendDebug" class="gold-button" :loading="debugLoading">
+          <el-icon><VideoPlay /></el-icon>
+          发送请求
+        </el-button>
+      </template>
+
+      <div v-if="debugResult" class="debug-result">
+        <div class="result-header">
+          <span class="result-title">响应结果</span>
+          <el-tag :type="debugResult.success ? 'success' : 'danger'" size="small">
+            {{ debugResult.success ? '成功' : '失败' }}
+          </el-tag>
+        </div>
+        <div v-if="debugResult.statusCode" class="result-item">
+          <span class="result-label">状态码：</span>
+          <span class="result-value">{{ debugResult.statusCode }}</span>
+        </div>
+        <div v-if="debugResult.body" class="result-item">
+          <span class="result-label">响应体：</span>
+          <pre class="result-content">{{ debugResult.body }}</pre>
+        </div>
+        <div v-if="debugResult.error" class="result-item">
+          <span class="result-label">错误信息：</span>
+          <pre class="result-content error">{{ debugResult.error }}</pre>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, RefreshLeft, Edit, Delete } from '@element-plus/icons-vue'
+import { Plus, Search, RefreshLeft, Edit, Delete, VideoPlay } from '@element-plus/icons-vue'
 import { apiInfoApi } from '@/api/api-info.api'
 
 const loading = ref(false)
@@ -151,6 +250,11 @@ const tableData = ref([])
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增接口')
 const formRef = ref(null)
+
+const debugDialogVisible = ref(false)
+const debugLoading = ref(false)
+const debugResult = ref(null)
+const debugFormRef = ref(null)
 
 const searchForm = reactive({
   path: '',
@@ -168,7 +272,16 @@ const formData = reactive({
   projectId: 1,
   path: '',
   method: 'GET',
-  params: ''
+  params: '',
+  header: '',
+  remark: ''
+})
+
+const debugForm = reactive({
+  path: '',
+  method: 'GET',
+  params: '',
+  header: ''
 })
 
 const formRules = {
@@ -190,6 +303,43 @@ const getMethodType = (method) => {
   return typeMap[method] || 'info'
 }
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const handleDebug = (row) => {
+  debugForm.path = row.path
+  debugForm.method = row.method
+  debugForm.params = row.params || ''
+  debugForm.header = row.header || ''
+  debugResult.value = null
+  debugDialogVisible.value = true
+}
+
+const handleSendDebug = async () => {
+  debugLoading.value = true
+  try {
+    const res = await apiInfoApi.debug({
+      path: debugForm.path,
+      method: debugForm.method,
+      params: debugForm.params,
+      header: debugForm.header
+    })
+    if (res.code === 0) {
+      debugResult.value = res.data
+    }
+  } catch (error) {
+    ElMessage.error('调试请求失败')
+  } finally {
+    debugLoading.value = false
+  }
+}
+
 const fetchData = async () => {
   loading.value = true
   try {
@@ -200,7 +350,7 @@ const fetchData = async () => {
       path: searchForm.path || undefined,
       method: searchForm.method || undefined
     })
-    if (res.code === 200) {
+    if (res.code === 0) {
       tableData.value = res.data.records
       pagination.total = res.data.total
     }
@@ -409,12 +559,16 @@ onMounted(() => {
     td {
       background: transparent;
       border-bottom: 1px solid #2c2d31;
-      color: #e5e5e5;
+      color: #000000;
     }
 
     tr:hover > td {
       background: rgba(255, 215, 0, 0.05);
     }
+  }
+
+  .empty-text {
+    color: #8e8e93;
   }
 
   .action-button {
@@ -538,6 +692,124 @@ onMounted(() => {
     &:hover {
       background: #3a3b3f;
       border-color: #ffd700;
+    }
+  }
+}
+
+.debug-dialog {
+  &:deep(.el-dialog) {
+    background: rgba(26, 27, 30, 0.95);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  &:deep(.el-dialog__header) {
+    .el-dialog__title {
+      color: #ffd700;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .el-dialog__headerbtn {
+      .el-dialog__close {
+        color: #8e8e93;
+
+        &:hover {
+          color: #ffd700;
+        }
+      }
+    }
+  }
+
+  &:deep(.el-dialog__body) {
+    .el-form-item__label {
+      color: #e5e5e5;
+    }
+
+    .el-input__wrapper {
+      background: #2c2d31;
+      border: 1px solid #4a4b4f;
+      color: #e5e5e5;
+
+      &:hover {
+        border-color: #ffd700;
+      }
+
+      &.is-focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+      }
+    }
+
+    .el-textarea__inner {
+      background: #2c2d31;
+      border: 1px solid #4a4b4f;
+      color: #e5e5e5;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+
+      &:hover {
+        border-color: #ffd700;
+      }
+
+      &:focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+      }
+    }
+  }
+
+  .debug-result {
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(44, 45, 49, 0.6);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 8px;
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      .result-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #ffd700;
+      }
+    }
+
+    .result-item {
+      margin-bottom: 12px;
+
+      .result-label {
+        font-weight: bold;
+        color: #e5e5e5;
+        margin-right: 8px;
+      }
+
+      .result-value {
+        color: #34c759;
+        font-weight: bold;
+      }
+
+      .result-content {
+        background: #1a1b1e;
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid #2c2d31;
+        color: #e5e5e5;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 8px;
+
+        &.error {
+          color: #ff3b30;
+          border-color: rgba(255, 59, 48, 0.3);
+        }
+      }
     }
   }
 }
