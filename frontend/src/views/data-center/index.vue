@@ -121,7 +121,7 @@ const fetchCategoryStats = async () => {
   loadingStats.value = true
   try {
     const res = await dataCenterApi.getCategoryStats()
-    if (res.code === 200) {
+    if (res.code === 0) {
       categoryStats.value = res.data
     }
   } catch (error) {
@@ -140,7 +140,7 @@ const fetchMetrics = async () => {
       category: searchForm.category || undefined,
       name: searchForm.name || undefined
     })
-    if (res.code === 200) {
+    if (res.code === 0) {
       tableData.value = res.data.records
       pagination.total = res.data.total
     }
