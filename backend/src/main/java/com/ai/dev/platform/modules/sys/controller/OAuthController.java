@@ -32,16 +32,22 @@ public class OAuthController {
 
     @Value("${frontend.redirect-uri:http://localhost:5173}")
     private String frontendRedirect;
+    private final com.ai.dev.platform.modules.sys.service.OAuthStateStore oauthStateStore;
 
-    public OAuthController(SysUserService sysUserService, JwtUtil jwtUtil) {
+    public OAuthController(SysUserService sysUserService, JwtUtil jwtUtil, com.ai.dev.platform.modules.sys.service.OAuthStateStore oauthStateStore) {
         this.sysUserService = sysUserService;
         this.jwtUtil = jwtUtil;
+        this.oauthStateStore = oauthStateStore;
     }
 
     @GetMapping("/callback")
     @Operation(summary = "GitHub 授权回调（会尝试用 code 换取用户信息并自动注册/登录）")
-    public ResponseEntity<Void> callback(@RequestParam String code) {
+    public ResponseEntity<Void> callback(@RequestParam String code, @RequestParam(required = false) String state) {
         if (clientId == null || clientId.isBlank() || clientSecret == null || clientSecret.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        // validate state param
+        if (state == null || !oauthStateStore.validateAndRemoveState(state)) {
             return ResponseEntity.badRequest().build();
         }
         // exchange code for access token

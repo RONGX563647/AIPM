@@ -25,7 +25,7 @@ public class AuthControllerTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        AuthController controller = new AuthController(sysUserService);
+        AuthController controller = new AuthController(sysUserService, new com.ai.dev.platform.modules.sys.service.OAuthStateStore());
         // ensure githubClientId blank to trigger error case
         Field f = AuthController.class.getDeclaredField("githubClientId");
         f.setAccessible(true);

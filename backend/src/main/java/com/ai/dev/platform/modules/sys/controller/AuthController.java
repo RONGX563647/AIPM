@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 @Tag(name = "auth", description = "注册/找回/社交登录")
 public class AuthController {
     private final SysUserService sysUserService;
+    private final com.ai.dev.platform.modules.sys.service.OAuthStateStore oauthStateStore;
 
     @Value("${github.client-id:}")
     private String githubClientId;
@@ -22,8 +23,9 @@ public class AuthController {
     @Value("${github.redirect-uri:http://localhost:8080/api/oauth/github/callback}")
     private String githubRedirectUri;
 
-    public AuthController(SysUserService sysUserService) {
+    public AuthController(SysUserService sysUserService, com.ai.dev.platform.modules.sys.service.OAuthStateStore oauthStateStore) {
         this.sysUserService = sysUserService;
+        this.oauthStateStore = oauthStateStore;
     }
 
     @PostMapping("/register")
@@ -120,10 +122,12 @@ public class AuthController {
     @Operation(summary = "获取 GitHub 授权重定向 URL")
     public Result<String> getGithubAuthorizeUrl() {
         if (githubClientId == null || githubClientId.isBlank()) return Result.error("GitHub OAuth 未配置");
-        String url = String.format("https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s",
+        String state = oauthStateStore.createState();
+        String url = String.format("https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%s",
                 URLEncoder.encode(githubClientId, StandardCharsets.UTF_8),
                 URLEncoder.encode(githubRedirectUri, StandardCharsets.UTF_8),
-                URLEncoder.encode("user:email", StandardCharsets.UTF_8));
+                URLEncoder.encode("user:email", StandardCharsets.UTF_8),
+                URLEncoder.encode(state, StandardCharsets.UTF_8));
         return Result.ok(url);
     }
 }
