@@ -1,47 +1,67 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <MainLayout v-if="isLoggedIn" />
+  <router-view v-else />
 </template>
 
-<style scoped>
-header {
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import MainLayout from '@/components/layout/MainLayout.vue'
+
+const route = useRoute()
+const isLoggedIn = computed(() => {
+  const token = localStorage.getItem('token')
+  const isLoginPage = route.path === '/login' || route.path === '/register' || route.path === '/forgot-password'
+  return token && !isLoginPage
+})
+</script>
+
+<style>
+/* 全局样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
   line-height: 1.5;
+  color: #E5E5E5;
+  background-color: #111113;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+/* 路由过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+::-webkit-scrollbar-track {
+  background: #1A1B1E;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B38B2D;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFD700;
 }
 </style>

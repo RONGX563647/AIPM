@@ -1,0 +1,102 @@
+/* 颜色系统 - 黑金主题 */
+:root {
+  /* 黑色系 */
+  --color-primary-black: #111113;
+  --color-secondary-black: #1A1B1E;
+  --color-dark-gray: #2C2D31;
+  --color-medium-gray: #4A4B4F;
+  --color-light-gray: #8E8E93;
+  --color-ultra-light-gray: #F2F2F7;
+  
+  /* 金色系 */
+  --color-gold-primary: #FFD700;
+  --color-gold-light: #FFED4E;
+  --color-gold-dark: #B38B2D;
+  --color-gold-darker: #8B6914;
+  --color-gold-glass: rgba(255, 215, 0, 0.1);
+  
+  /* 功能色 */
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --color-danger: #FF3B30;
+  --color-info: #007AFF;
+  --color-link: #0A84FF;
+  
+  /* 渐变 */
+  --gradient-gold: linear-gradient(135deg, var(--color-gold-primary) 0%, var(--color-gold-dark) 100%);
+  --gradient-gold-reverse: linear-gradient(135deg, var(--color-gold-dark) 0%, var(--color-gold-primary) 100%);
+  --gradient-black: linear-gradient(135deg, var(--color-primary-black) 0%, var(--color-dark-gray) 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.02) 100%);
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 0 20px rgba(255, 215, 0, 0.3);
+  
+  /* 间距系统 (8px基准) */
+  --spacing-0: 0;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-xxxl: 64px;
+  
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* 动画时长 */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 800ms;
+  
+  /* 缓动函数 */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* 玻璃态模糊 */
+  --backdrop-blur-sm: blur(4px);
+  --backdrop-blur-md: blur(8px);
+  --backdrop-blur-lg: blur(16px);
+  --backdrop-blur-xl: blur(24px);
+  
+  /* 边框 */
+  --border-gold-sm: 1px solid rgba(255, 215, 0, 0.3);
+  --border-gold-md: 2px solid var(--color-gold-primary);
+  --border-gray: 1px solid var(--color-medium-gray);
+  --border-gray-light: 1px solid var(--color-light-gray);
+  
+  /* 字体 */
+  --font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-size-xxxl: 32px;
+  
+  /* 字重 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 继承默认值，因为我们的主题已经是暗色 */
+  }
+}

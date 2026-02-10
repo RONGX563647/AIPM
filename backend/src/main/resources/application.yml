@@ -9,26 +9,26 @@ server:
 # Database Configuration
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    url: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
+    username: postgres.vihtgkpsqkqfyndjrfoa
+    password: RONGx@563647
+    driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
-      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
-      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:30000}
-      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:120000}
-      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 120000
+      connection-timeout: 30000
 
   # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
-    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+      ddl-auto: none
+    show-sql: false
     properties:
       hibernate:
-        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
-    open-in-view: ${SPRING_JPA_OPEN_IN_VIEW:false}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
 
 # MyBatis-Plus Configuration
 mybatis-plus:
@@ -55,3 +55,21 @@ logging:
 jwt:
   secret: ${JWT_SECRET:ai-code-review-secret-key-2024}
   expiration: ${JWT_EXPIRATION:86400000}
+
+# GitHub OAuth (fill via env)
+github:
+  client-id: ${GITHUB_CLIENT_ID:}
+  client-secret: ${GITHUB_CLIENT_SECRET:}
+  redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:8080/api/oauth/github/callback}
+
+# Startup behavior
+# If true the application will fail to start when the DB connectivity check fails.
+# Default: false (do not fail on start; just log the error)
+app:
+  startup:
+    failOnDatabaseCheck: ${APP_STARTUP_FAIL_ON_DATABASE_CHECK:false}
+    retry:
+      enabled: ${APP_STARTUP_RETRY_ENABLED:true}
+      maxAttempts: ${APP_STARTUP_RETRY_MAX_ATTEMPTS:5}
+      initialDelayMs: ${APP_STARTUP_RETRY_INITIAL_DELAY_MS:1000}
+      backoffMultiplier: ${APP_STARTUP_RETRY_BACKOFF_MULTIPLIER:2.0}

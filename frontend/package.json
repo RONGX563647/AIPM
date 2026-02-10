@@ -9,10 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.27"
+    "@element-plus/icons-vue": "^2.3.2",
+    "axios": "^1.13.5",
+    "element-plus": "^2.13.2",
+    "jwt-decode": "^4.0.0",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.27",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.3",
+    "sass": "^1.97.3",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.5"
   },

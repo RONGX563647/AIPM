@@ -31,12 +31,15 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(Long userId, String username) {
+    public String generateToken(Long userId, String username, String[] roles) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMillis);
         Map<String, Object> claims = new HashMap<>();
         claims.put("uid", userId);
         claims.put("uname", username);
+        if (roles != null && roles.length > 0) {
+            claims.put("roles", roles);
+        }
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -44,6 +47,11 @@ public class JwtUtil {
                 .setExpiration(exp)
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // compatibility method
+    public String generateToken(Long userId, String username) {
+        return generateToken(userId, username, null);
     }
 
     public Jws<Claims> parseToken(String token) {

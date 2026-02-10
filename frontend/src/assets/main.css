@@ -1,35 +1,256 @@
-@import './base.css';
+/* 导入CSS变量 */
+@import './styles/variables.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+/* 全局样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-a,
-.green {
+/* 基础样式 */
+html {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  color: var(--color-ultra-light-gray);
+  background-color: var(--color-primary-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-secondary-black);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold-dark);
+  border-radius: var(--radius-full);
+  
+  &:hover {
+    background: var(--color-gold-primary);
+  }
+}
+
+/* 选择文本样式 */
+::selection {
+  background-color: var(--color-gold-glass);
+  color: var(--color-gold-primary);
+}
+
+/* 链接样式 */
+a {
+  color: var(--color-link);
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+  transition: color var(--duration-fast) var(--ease-in-out);
+  
+  &:hover {
+    color: var(--color-gold-primary);
   }
 }
 
-@media (min-width: 1024px) {
+/* 图片样式 */
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* 输入框占位符 */
+::placeholder {
+  color: var(--color-light-gray);
+  opacity: 0.7;
+}
+
+/* 禁用状态 */
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 工具类 */
+.text-gold {
+  color: var(--color-gold-primary);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+.bg-glass {
+  background: var(--gradient-glass);
+  backdrop-filter: var(--backdrop-blur-md);
+  border: var(--border-gold-sm);
+}
+
+.shadow-gold {
+  box-shadow: var(--shadow-gold);
+}
+
+.gold-border {
+  border: var(--border-gold-md);
+  border-radius: var(--radius-md);
+}
+
+/* 动画类 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--duration-normal) var(--ease-in-out);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.scale-enter-active,
+.scale-leave-active {
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+/* 布局类 */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* 响应式断点 */
+@media (max-width: 1200px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 540px;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    max-width: 100%;
+  }
+  
+  .flex {
+    flex-direction: column;
+  }
+}
+
+/* 打印样式 */
+@media print {
   body {
-    display: flex;
-    place-items: center;
+    background: white;
+    color: black;
   }
+  
+  .no-print {
+    display: none !important;
+  }
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  :root {
+    --color-gold-primary: #FFD700;
+    --color-gold-dark: #8B6914;
+    --border-gold-sm: 1px solid var(--color-gold-primary);
+  }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

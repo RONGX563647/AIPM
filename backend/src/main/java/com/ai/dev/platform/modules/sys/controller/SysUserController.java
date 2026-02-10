@@ -5,7 +5,6 @@ import com.ai.dev.platform.modules.sys.service.SysUserService;
 import com.ai.dev.platform.modules.sys.dto.LoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,8 +19,8 @@ public class SysUserController {
 
     @PostMapping("/login")
     @Operation(summary = "用户登录")
-    public Result<String> login(@RequestParam String username, @RequestParam String password) {
-        String token = sysUserService.login(username, password);
+    public Result<String> login(@RequestBody LoginRequest request) {
+        String token = sysUserService.login(request.getUsername(), request.getPassword());
         if (token == null) return Result.error("用户名或密码错误");
         return Result.ok(token);
     }
