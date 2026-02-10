@@ -16,22 +16,22 @@
             <div class="stat-label">总监控项</div>
           </div>
         </el-card>
-        <el-card class="stat-card warning">
-          <div class="stat-content">
-            <div class="stat-value">{{ stats.warning }}</div>
-            <div class="stat-label">警告</div>
-          </div>
-        </el-card>
-        <el-card class="stat-card critical">
-          <div class="stat-content">
-            <div class="stat-value">{{ stats.critical }}</div>
-            <div class="stat-label">严重</div>
-          </div>
-        </el-card>
         <el-card class="stat-card normal">
           <div class="stat-content">
             <div class="stat-value">{{ stats.normal }}</div>
             <div class="stat-label">正常</div>
+          </div>
+        </el-card>
+        <el-card class="stat-card slow">
+          <div class="stat-content">
+            <div class="stat-value">{{ stats.slow }}</div>
+            <div class="stat-label">缓慢</div>
+          </div>
+        </el-card>
+        <el-card class="stat-card exception">
+          <div class="stat-content">
+            <div class="stat-value">{{ stats.exception }}</div>
+            <div class="stat-label">异常</div>
           </div>
         </el-card>
       </div>
@@ -61,8 +61,8 @@
               class="search-select"
             >
               <el-option label="正常" value="normal" />
-              <el-option label="警告" value="warning" />
-              <el-option label="严重" value="critical" />
+              <el-option label="缓慢" value="slow" />
+              <el-option label="异常" value="exception" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -86,9 +86,8 @@
           stripe
           class="monitor-table"
         >
-          <el-table-column prop="metricName" label="监控指标" min-width="150" show-overflow-tooltip />
-          <el-table-column prop="metricValue" label="指标值" width="120" />
-          <el-table-column prop="threshold" label="阈值" width="120" />
+          <el-table-column prop="monitorUrl" label="监控URL" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="responseTime" label="响应时间(ms)" width="120" />
           <el-table-column prop="status" label="状态" width="100">
             <template #default="{ row }">
               <el-tag :type="getStatusType(row.status)" size="small">
@@ -96,15 +95,23 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="alertMessage" label="告警信息" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="createTime" label="监控时间" width="180">
+          <el-table-column prop="updateTime" label="更新时间" width="180">
             <template #default="{ row }">
-              <span v-if="row.createTime">{{ formatDate(row.createTime) }}</span>
+              <span v-if="row.updateTime">{{ formatDate(row.updateTime) }}</span>
               <span v-else class="empty-text">-</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="150" fixed="right">
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
+              <el-button
+                type="primary"
+                link
+                @click="handleViewUptime(row)"
+                class="action-button"
+              >
+                <el-icon><DataAnalysis /></el-icon>
+                可用性
+              </el-button>
               <el-button
                 type="danger"
                 link
@@ -153,14 +160,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="监控指标" prop="metricName">
-          <el-input v-model="formData.metricName" placeholder="请输入监控指标名称" />
-        </el-form-item>
-        <el-form-item label="指标值" prop="metricValue">
-          <el-input-number v-model="formData.metricValue" :precision="2" :step="0.1" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="告警阈值" prop="threshold">
-          <el-input-number v-model="formData.threshold" :precision="2" :step="0.1" style="width: 100%" />
+        <el-form-item label="监控URL" prop="monitorUrl">
+          <el-input v-model="formData.monitorUrl" placeholder="请输入监控URL" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -168,13 +169,25 @@
         <el-button type="primary" @click="handleSubmit" class="gold-button">确定</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="uptimeDialogVisible"
+      title="可用性统计"
+      width="400px"
+      class="uptime-dialog"
+    >
+      <div class="uptime-content">
+        <div class="uptime-value">{{ uptime }}%</div>
+        <div class="uptime-label">可用率</div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, RefreshLeft, Delete } from '@element-plus/icons-vue'
+import { Plus, Search, RefreshLeft, Delete, DataAnalysis } from '@element-plus/icons-vue'
 import { monitorApi } from '@/api/monitor.api'
 import { projectApi } from '@/api/project.api'
 
@@ -182,7 +195,9 @@ const loading = ref(false)
 const tableData = ref([])
 const projects = ref([])
 const dialogVisible = ref(false)
+const uptimeDialogVisible = ref(false)
 const formRef = ref(null)
+const uptime = ref(0)
 
 const searchForm = reactive({
   projectId: null,
@@ -197,39 +212,31 @@ const pagination = reactive({
 
 const formData = reactive({
   projectId: null,
-  metricName: '',
-  metricValue: 0,
-  threshold: 0
+  monitorUrl: ''
 })
 
 const formRules = {
   projectId: [
     { required: true, message: '请选择项目', trigger: 'change' }
   ],
-  metricName: [
-    { required: true, message: '请输入监控指标名称', trigger: 'blur' }
-  ],
-  metricValue: [
-    { required: true, message: '请输入指标值', trigger: 'blur' }
-  ],
-  threshold: [
-    { required: true, message: '请输入告警阈值', trigger: 'blur' }
+  monitorUrl: [
+    { required: true, message: '请输入监控URL', trigger: 'blur' }
   ]
 }
 
 const stats = computed(() => {
   const total = tableData.value.length
   const normal = tableData.value.filter(item => item.status === 'normal').length
-  const warning = tableData.value.filter(item => item.status === 'warning').length
-  const critical = tableData.value.filter(item => item.status === 'critical').length
-  return { total, normal, warning, critical }
+  const slow = tableData.value.filter(item => item.status === 'slow').length
+  const exception = tableData.value.filter(item => item.status === 'exception').length
+  return { total, normal, slow, exception }
 })
 
 const getStatusType = (status) => {
   const typeMap = {
     normal: 'success',
-    warning: 'warning',
-    critical: 'danger'
+    slow: 'warning',
+    exception: 'danger'
   }
   return typeMap[status] || 'info'
 }
@@ -237,8 +244,8 @@ const getStatusType = (status) => {
 const getStatusText = (status) => {
   const textMap = {
     normal: '正常',
-    warning: '警告',
-    critical: '严重'
+    slow: '缓慢',
+    exception: '异常'
   }
   return textMap[status] || status
 }
@@ -302,6 +309,18 @@ const handleAdd = () => {
   dialogVisible.value = true
 }
 
+const handleViewUptime = async (row) => {
+  try {
+    const res = await monitorApi.getUptime(row.projectId)
+    if (res.code === 0) {
+      uptime.value = res.data
+      uptimeDialogVisible.value = true
+    }
+  } catch (error) {
+    ElMessage.error('获取可用性统计失败')
+  }
+}
+
 const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除该监控记录吗？', '提示', {
     confirmButtonText: '确定',
@@ -340,9 +359,7 @@ const handleSubmit = async () => {
 
 const resetForm = () => {
   formData.projectId = null
-  formData.metricName = ''
-  formData.metricValue = 0
-  formData.threshold = 0
+  formData.monitorUrl = ''
   formRef.value?.clearValidate()
 }
 
@@ -431,16 +448,16 @@ onMounted(() => {
         border-left: 4px solid #ffd700;
       }
 
-      &.warning {
+      &.normal {
+        border-left: 4px solid #34c759;
+      }
+
+      &.slow {
         border-left: 4px solid #ff9500;
       }
 
-      &.critical {
+      &.exception {
         border-left: 4px solid #ff3b30;
-      }
-
-      &.normal {
-        border-left: 4px solid #34c759;
       }
 
       .stat-content {
@@ -579,7 +596,8 @@ onMounted(() => {
   }
 }
 
-.monitor-dialog {
+.monitor-dialog,
+.uptime-dialog {
   &:deep(.el-dialog) {
     background: rgba(26, 27, 30, 0.95);
     border: 1px solid rgba(255, 215, 0, 0.3);
@@ -634,6 +652,26 @@ onMounted(() => {
       background: #3a3b3f;
       border-color: #ffd700;
     }
+  }
+}
+
+.uptime-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+
+  .uptime-value {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 16px;
+  }
+
+  .uptime-label {
+    font-size: 18px;
+    color: #8e8e93;
   }
 }
 </style>

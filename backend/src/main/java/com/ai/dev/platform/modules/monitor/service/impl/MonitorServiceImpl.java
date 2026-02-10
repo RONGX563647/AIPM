@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MonitorServiceImpl extends ServiceImpl<MonitorMapper, Monitor> implements MonitorService {
@@ -28,7 +28,7 @@ public class MonitorServiceImpl extends ServiceImpl<MonitorMapper, Monitor> impl
             wrapper.eq(Monitor::getStatus, status);
         }
         
-        wrapper.orderByDesc(Monitor::getCreateTime);
+        wrapper.orderByDesc(Monitor::getUpdateTime);
         
         return page(page, wrapper);
     }
@@ -36,29 +36,47 @@ public class MonitorServiceImpl extends ServiceImpl<MonitorMapper, Monitor> impl
     @Override
     public Monitor addMonitor(Monitor monitor) {
         monitor.setCreateTime(LocalDateTime.now());
-        
-        BigDecimal metricValue = monitor.getMetricValue();
-        BigDecimal threshold = monitor.getThreshold();
-        
-        if (metricValue != null && threshold != null) {
-            int compare = metricValue.compareTo(threshold);
-            if (compare > 0) {
-                monitor.setStatus("critical");
-                monitor.setAlertMessage(monitor.getMetricName() + "指标值" + metricValue + "超过阈值" + threshold);
-            } else if (compare == 0) {
-                monitor.setStatus("warning");
-                monitor.setAlertMessage(monitor.getMetricName() + "指标值" + metricValue + "达到阈值" + threshold);
-            } else {
-                monitor.setStatus("normal");
-                monitor.setAlertMessage(null);
-            }
-        } else {
-            monitor.setStatus("normal");
-            monitor.setAlertMessage(null);
-        }
+        monitor.setUpdateTime(LocalDateTime.now());
+        monitor.setResponseTime(0);
+        monitor.setStatus("normal");
         
         save(monitor);
         
         return monitor;
+    }
+
+    @Override
+    public Double getUptime(Long projectId) {
+        LambdaQueryWrapper<Monitor> wrapper = new LambdaQueryWrapper<>();
+        if (projectId != null) {
+            wrapper.eq(Monitor::getProjectId, projectId);
+        }
+        
+        List<Monitor> monitors = list(wrapper);
+        
+        if (monitors.isEmpty()) {
+            return 0.0;
+        }
+        
+        long normalCount = monitors.stream()
+            .filter(m -> "normal".equals(m.getStatus()))
+            .count();
+        
+        return (double) normalCount / monitors.size() * 100;
+    }
+
+    public void checkMonitorStatus(Monitor monitor, Integer responseTime, Integer slowThreshold) {
+        monitor.setResponseTime(responseTime);
+        monitor.setUpdateTime(LocalDateTime.now());
+        
+        if (responseTime == null || responseTime < 0) {
+            monitor.setStatus("exception");
+        } else if (responseTime > slowThreshold) {
+            monitor.setStatus("slow");
+        } else {
+            monitor.setStatus("normal");
+        }
+        
+        updateById(monitor);
     }
 }

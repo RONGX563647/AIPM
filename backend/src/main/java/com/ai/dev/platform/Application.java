@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -14,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 @SpringBootApplication
+@EnableScheduling
 public class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 

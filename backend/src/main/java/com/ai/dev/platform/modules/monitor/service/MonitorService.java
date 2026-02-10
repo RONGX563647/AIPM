@@ -8,4 +8,8 @@ public interface MonitorService extends IService<Monitor> {
     IPage<Monitor> getMonitorPage(Integer pageNum, Integer pageSize, Long projectId, String status);
 
     Monitor addMonitor(Monitor monitor);
+
+    Double getUptime(Long projectId);
+
+    void checkMonitorStatus(Monitor monitor, Integer responseTime, Integer slowThreshold);
 }

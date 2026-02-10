@@ -3,12 +3,11 @@ import api from './auth.api'
 export interface Monitor {
   id?: number
   projectId: number
-  metricName: string
-  metricValue: number
-  threshold: number
+  monitorUrl: string
+  responseTime: number
   status: string
-  alertMessage?: string
   createTime?: string
+  updateTime?: string
 }
 
 export interface MonitorPageRequest {
@@ -38,7 +37,7 @@ export const monitorApi = {
     return api.delete(`/monitor/delete/${id}`)
   },
 
-  alerts: (params: MonitorPageRequest) => {
-    return api.get<MonitorPageResponse>('/monitor/alerts', { params })
+  getUptime: (projectId: number) => {
+    return api.get<number>(`/monitor/uptime/${projectId}`)
   }
 }

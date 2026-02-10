@@ -17,7 +17,7 @@ public class MonitorController {
     @Autowired
     private MonitorService monitorService;
 
-    @Operation(summary = "新增监控记录")
+    @Operation(summary = "新增监控配置")
     @PostMapping("/add")
     public Result<Monitor> addMonitor(@RequestBody Monitor monitor) {
         Monitor result = monitorService.addMonitor(monitor);
@@ -38,19 +38,16 @@ public class MonitorController {
 
     @Operation(summary = "删除监控记录")
     @DeleteMapping("/delete/{id}")
-    public Result<Void> deleteMonitor(@PathVariable Long id) {
+    public Result<String> deleteMonitor(@PathVariable Long id) {
         boolean ok = monitorService.removeById(id);
         if (!ok) return Result.error("删除失败");
-        return Result.ok(null);
+        return Result.ok("删除成功");
     }
 
-    @Operation(summary = "获取告警记录")
-    @GetMapping("/alerts")
-    public Result<IPage<Monitor>> getAlerts(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false) Long projectId) {
-        IPage<Monitor> page = monitorService.getMonitorPage(pageNum, pageSize, projectId, "critical");
-        return Result.ok(page);
+    @Operation(summary = "获取可用性统计")
+    @GetMapping("/uptime/{project_id}")
+    public Result<Double> getUptime(@PathVariable("project_id") Long projectId) {
+        Double uptime = monitorService.getUptime(projectId);
+        return Result.ok(uptime);
     }
 }

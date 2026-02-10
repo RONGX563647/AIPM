@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,24 +22,22 @@ public class Monitor {
     @Schema(description = "关联项目ID")
     private Long projectId;
 
-    @Schema(description = "监控指标名称")
-    private String metricName;
+    @Schema(description = "监控URL")
+    private String monitorUrl;
 
-    @Schema(description = "指标值")
-    private BigDecimal metricValue;
-
-    @Schema(description = "告警阈值")
-    private BigDecimal threshold;
+    @Schema(description = "响应时间（毫秒）")
+    private Integer responseTime;
 
     @Schema(description = "监控状态")
     private String status;
 
-    @Schema(description = "告警信息")
-    private String alertMessage;
-
     @TableField("create_time")
-    @Schema(description = "监控时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
+
+    @TableField("update_time")
+    @Schema(description = "更新时间")
+    private LocalDateTime updateTime;
 
     public Long getId() {
         return id;
@@ -58,28 +55,20 @@ public class Monitor {
         this.projectId = projectId;
     }
 
-    public String getMetricName() {
-        return metricName;
+    public String getMonitorUrl() {
+        return monitorUrl;
     }
 
-    public void setMetricName(String metricName) {
-        this.metricName = metricName;
+    public void setMonitorUrl(String monitorUrl) {
+        this.monitorUrl = monitorUrl;
     }
 
-    public BigDecimal getMetricValue() {
-        return metricValue;
+    public Integer getResponseTime() {
+        return responseTime;
     }
 
-    public void setMetricValue(BigDecimal metricValue) {
-        this.metricValue = metricValue;
-    }
-
-    public BigDecimal getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(BigDecimal threshold) {
-        this.threshold = threshold;
+    public void setResponseTime(Integer responseTime) {
+        this.responseTime = responseTime;
     }
 
     public String getStatus() {
@@ -90,19 +79,19 @@ public class Monitor {
         this.status = status;
     }
 
-    public String getAlertMessage() {
-        return alertMessage;
-    }
-
-    public void setAlertMessage(String alertMessage) {
-        this.alertMessage = alertMessage;
-    }
-
     public LocalDateTime getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 }
