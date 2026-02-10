@@ -95,6 +95,15 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/monitor',
+    name: 'Monitor',
+    component: () => import('@/views/monitor/index.vue'),
+    meta: {
+      title: '系统监控',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/data-center',
     name: 'DataCenter',
     component: () => import('@/views/data-center/index.vue'),

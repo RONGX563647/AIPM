@@ -171,7 +171,7 @@ const menuItems = computed(() => [
     index: 'monitoring',
     icon: Monitor,
     title: '系统监控',
-    path: '/monitoring',
+    path: '/monitor',
     roles: ['ADMIN', 'SUPER_ADMIN'] // 仅管理员可访问
   },
   {
