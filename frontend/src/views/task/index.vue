@@ -32,18 +32,11 @@
         >
           <el-table-column prop="title" label="任务标题" min-width="150" />
           <el-table-column prop="content" label="任务内容" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="status" label="状态" width="120">
+          <el-table-column prop="status" label="状态" width="100">
             <template #default="{ row }">
-              <el-select
-                v-model="row.status"
-                @change="handleStatusChange(row)"
-                size="small"
-                class="status-select"
-              >
-                <el-option label="待办" value="todo" />
-                <el-option label="进行中" value="doing" />
-                <el-option label="已完成" value="done" />
-              </el-select>
+              <el-tag :type="getStatusType(row.status)" size="small">
+                {{ getStatusText(row.status) }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="priority" label="优先级" width="100">
@@ -67,7 +60,12 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="180" />
+          <el-table-column prop="createTime" label="创建时间" width="120">
+            <template #default="{ row }">
+              <span v-if="row.createTime">{{ formatDate(row.createTime) }}</span>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
               <el-button
@@ -224,6 +222,33 @@ const getPriorityText = (priority) => {
   return textMap[priority] || priority
 }
 
+const getStatusType = (status) => {
+  const typeMap = {
+    todo: 'info',
+    doing: 'warning',
+    done: 'success'
+  }
+  return typeMap[status] || 'info'
+}
+
+const getStatusText = (status) => {
+  const textMap = {
+    todo: '待办',
+    doing: '进行中',
+    done: '已完成'
+  }
+  return textMap[status] || status
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 const fetchProgress = async () => {
   try {
     const res = await taskApi.getProgress(formData.projectId)
@@ -282,16 +307,6 @@ const handleDelete = (row) => {
       ElMessage.error('删除失败')
     }
   }).catch(() => {})
-}
-
-const handleStatusChange = async (row) => {
-  try {
-    await taskApi.update(row)
-    ElMessage.success('状态更新成功')
-    fetchProgress()
-  } catch (error) {
-    ElMessage.error('状态更新失败')
-  }
 }
 
 const handleProgressChange = async (row) => {
@@ -451,21 +466,11 @@ onMounted(() => {
     td {
       background: transparent;
       border-bottom: 1px solid #2c2d31;
-      color: #e5e5e5;
+      color: #000000;
     }
 
     tr:hover > td {
       background: rgba(255, 215, 0, 0.05);
-    }
-  }
-
-  .status-select {
-    width: 100px;
-
-    &:deep(.el-input__wrapper) {
-      background: #2c2d31;
-      border: 1px solid #4a4b4f;
-      color: #e5e5e5;
     }
   }
 
@@ -506,6 +511,10 @@ onMounted(() => {
     &:hover {
       color: #ffed4e;
     }
+  }
+
+  .empty-text {
+    color: #8e8e93;
   }
 }
 

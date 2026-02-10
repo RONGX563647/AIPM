@@ -147,6 +147,13 @@ const menuItems = computed(() => [
     roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
   },
   {
+    index: 'test',
+    icon: Box,
+    title: '接口测试',
+    path: '/test',
+    roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
+  },
+  {
     index: 'code-review',
     icon: DocumentChecked,
     title: '代码评审',
@@ -173,13 +180,6 @@ const menuItems = computed(() => [
     title: '部署记录',
     path: '/deploy',
     roles: ['ADMIN', 'SUPER_ADMIN'] // 仅管理员可访问
-  },
-  {
-    index: 'test',
-    icon: Box,
-    title: '接口测试',
-    path: '/test',
-    roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
   }
 ])
 
