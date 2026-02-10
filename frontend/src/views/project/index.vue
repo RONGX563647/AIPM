@@ -53,39 +53,117 @@
           stripe
           class="project-table"
         >
-          <el-table-column prop="name" label="项目名称" min-width="150" />
-          <el-table-column prop="description" label="项目描述" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="techStack" label="技术栈" min-width="150" show-overflow-tooltip />
-          <el-table-column prop="status" label="状态" width="100">
+          <el-table-column prop="name" label="项目名称" min-width="120">
+            <template #default="{ row }">
+              <template v-if="row.name">
+                <el-tooltip
+                  :content="row.name"
+                  placement="top"
+                  :disabled="!row.name || row.name.length <= 20"
+                >
+                  <template v-if="row.gitUrl">
+                    <a
+                      :href="row.gitUrl"
+                      target="_blank"
+                      class="name-link ellipsis"
+                      >{{ row.name }}</a
+                    >
+                  </template>
+                  <span v-else class="name-text ellipsis">{{ row.name }}</span>
+                </el-tooltip>
+              </template>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="description"
+            label="项目描述"
+            min-width="150"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            prop="techStack"
+            label="技术栈"
+            min-width="120"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="status" label="状态" width="80">
             <template #default="{ row }">
               <el-tag :type="getStatusType(row.status)" size="small">
                 {{ getStatusText(row.status) }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="onlineUrl" label="线上地址" min-width="150" show-overflow-tooltip />
-          <el-table-column prop="docUrl" label="文档地址" min-width="150" show-overflow-tooltip />
-          <el-table-column prop="createTime" label="创建时间" width="180" />
-          <el-table-column label="操作" width="200" fixed="right">
+          <el-table-column prop="onlineUrl" label="线上地址" min-width="160">
             <template #default="{ row }">
-              <el-button
-                type="primary"
-                link
-                @click="handleEdit(row)"
-                class="action-button"
-              >
-                <el-icon><Edit /></el-icon>
-                编辑
-              </el-button>
-              <el-button
-                type="danger"
-                link
-                @click="handleDelete(row)"
-                class="action-button"
-              >
-                <el-icon><Delete /></el-icon>
-                删除
-              </el-button>
+              <template v-if="row.onlineUrl">
+                <el-tooltip
+                  :content="row.onlineUrl"
+                  placement="top"
+                  :disabled="!row.onlineUrl || row.onlineUrl.length <= 30"
+                >
+                  <a
+                    :href="row.onlineUrl"
+                    target="_blank"
+                    class="link-text ellipsis"
+                  >
+                    {{ row.onlineUrl }}
+                  </a>
+                </el-tooltip>
+              </template>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="docUrl" label="文档地址" min-width="160">
+            <template #default="{ row }">
+              <template v-if="row.docUrl">
+                <el-tooltip
+                  :content="row.docUrl"
+                  placement="top"
+                  :disabled="!row.docUrl || row.docUrl.length <= 30"
+                >
+                  <a
+                    :href="row.docUrl"
+                    target="_blank"
+                    class="link-text ellipsis"
+                  >
+                    {{ row.docUrl }}
+                  </a>
+                </el-tooltip>
+              </template>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建时间" width="120">
+            <template #default="{ row }">
+              <span v-if="row.createTime">{{
+                formatDate(row.createTime)
+              }}</span>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="140" fixed="right">
+            <template #default="{ row }">
+              <div class="action-buttons">
+                <el-button
+                  type="primary"
+                  link
+                  @click="handleEdit(row)"
+                  class="action-button"
+                >
+                  <el-icon><Edit /></el-icon>
+                  编辑
+                </el-button>
+                <el-button
+                  type="danger"
+                  link
+                  @click="handleDelete(row)"
+                  class="action-button"
+                >
+                  <el-icon><Delete /></el-icon>
+                  删除
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -130,10 +208,17 @@
           <el-input v-model="formData.gitUrl" placeholder="请输入Git仓库地址" />
         </el-form-item>
         <el-form-item label="技术栈" prop="techStack">
-          <el-input v-model="formData.techStack" placeholder="请输入技术栈，如：SpringBoot3,Vue3,MySQL" />
+          <el-input
+            v-model="formData.techStack"
+            placeholder="请输入技术栈，如：SpringBoot3,Vue3,MySQL"
+          />
         </el-form-item>
         <el-form-item label="项目状态" prop="status">
-          <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%">
+          <el-select
+            v-model="formData.status"
+            placeholder="请选择状态"
+            style="width: 100%"
+          >
             <el-option label="开发中" value="developing" />
             <el-option label="测试中" value="testing" />
             <el-option label="已上线" value="online" />
@@ -141,191 +226,211 @@
           </el-select>
         </el-form-item>
         <el-form-item label="线上地址" prop="onlineUrl">
-          <el-input v-model="formData.onlineUrl" placeholder="请输入线上访问地址" />
+          <el-input
+            v-model="formData.onlineUrl"
+            placeholder="请输入线上访问地址"
+          />
         </el-form-item>
         <el-form-item label="文档地址" prop="docUrl">
           <el-input v-model="formData.docUrl" placeholder="请输入文档地址" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false" class="cancel-button">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" class="gold-button">确定</el-button>
+        <el-button @click="dialogVisible = false" class="cancel-button"
+          >取消</el-button
+        >
+        <el-button type="primary" @click="handleSubmit" class="gold-button"
+          >确定</el-button
+        >
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, RefreshLeft, Edit, Delete } from '@element-plus/icons-vue'
-import { projectApi } from '@/api/project.api'
+import { ref, reactive, onMounted } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  Plus,
+  Search,
+  RefreshLeft,
+  Edit,
+  Delete,
+} from "@element-plus/icons-vue";
+import { projectApi } from "@/api/project.api";
 
-const loading = ref(false)
-const tableData = ref([])
-const dialogVisible = ref(false)
-const dialogTitle = ref('新增项目')
-const formRef = ref(null)
+const loading = ref(false);
+const tableData = ref([]);
+const dialogVisible = ref(false);
+const dialogTitle = ref("新增项目");
+const formRef = ref(null);
 
 const searchForm = reactive({
-  name: '',
-  status: ''
-})
+  name: "",
+  status: "",
+});
 
 const pagination = reactive({
   pageNum: 1,
   pageSize: 10,
-  total: 0
-})
+  total: 0,
+});
 
 const formData = reactive({
   id: null,
-  name: '',
-  description: '',
-  gitUrl: '',
-  techStack: '',
-  status: 'developing',
-  onlineUrl: '',
-  docUrl: ''
-})
+  name: "",
+  description: "",
+  gitUrl: "",
+  techStack: "",
+  status: "developing",
+  onlineUrl: "",
+  docUrl: "",
+});
 
 const formRules = {
-  name: [
-    { required: true, message: '请输入项目名称', trigger: 'blur' }
-  ],
-  status: [
-    { required: true, message: '请选择项目状态', trigger: 'change' }
-  ]
-}
+  name: [{ required: true, message: "请输入项目名称", trigger: "blur" }],
+  status: [{ required: true, message: "请选择项目状态", trigger: "change" }],
+};
 
 const getStatusType = (status) => {
   const typeMap = {
-    developing: 'warning',
-    testing: 'primary',
-    online: 'success',
-    stop: 'info'
-  }
-  return typeMap[status] || 'info'
-}
+    developing: "warning",
+    testing: "primary",
+    online: "success",
+    stop: "info",
+  };
+  return typeMap[status] || "info";
+};
 
 const getStatusText = (status) => {
   const textMap = {
-    developing: '开发中',
-    testing: '测试中',
-    online: '已上线',
-    stop: '停滞'
-  }
-  return textMap[status] || status
-}
+    developing: "开发中",
+    testing: "测试中",
+    online: "已上线",
+    stop: "停滞",
+  };
+  return textMap[status] || status;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 const fetchData = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     const res = await projectApi.page({
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize,
       name: searchForm.name || undefined,
-      status: searchForm.status || undefined
-    })
-    if (res.code === 200) {
-      tableData.value = res.data.records
-      pagination.total = res.data.total
+      status: searchForm.status || undefined,
+    });
+    if (res.code === 0) {
+      tableData.value = res.data.records;
+      pagination.total = res.data.total;
     }
   } catch (error) {
-    ElMessage.error('获取项目列表失败')
+    ElMessage.error("获取项目列表失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const handleSearch = () => {
-  pagination.pageNum = 1
-  fetchData()
-}
+  pagination.pageNum = 1;
+  fetchData();
+};
 
 const handleReset = () => {
-  searchForm.name = ''
-  searchForm.status = ''
-  pagination.pageNum = 1
-  fetchData()
-}
+  searchForm.name = "";
+  searchForm.status = "";
+  pagination.pageNum = 1;
+  fetchData();
+};
 
 const handleAdd = () => {
-  dialogTitle.value = '新增项目'
-  resetForm()
-  dialogVisible.value = true
-}
+  dialogTitle.value = "新增项目";
+  resetForm();
+  dialogVisible.value = true;
+};
 
 const handleEdit = (row) => {
-  dialogTitle.value = '编辑项目'
-  Object.assign(formData, row)
-  dialogVisible.value = true
-}
+  dialogTitle.value = "编辑项目";
+  Object.assign(formData, row);
+  dialogVisible.value = true;
+};
 
 const handleDelete = (row) => {
-  ElMessageBox.confirm('确定要删除该项目吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    try {
-      await projectApi.delete(row.id)
-      ElMessage.success('删除成功')
-      fetchData()
-    } catch (error) {
-      ElMessage.error('删除失败')
-    }
-  }).catch(() => {})
-}
+  ElMessageBox.confirm("确定要删除该项目吗？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      try {
+        await projectApi.delete(row.id);
+        ElMessage.success("删除成功");
+        fetchData();
+      } catch (error) {
+        ElMessage.error("删除失败");
+      }
+    })
+    .catch(() => {});
+};
 
 const handleSubmit = async () => {
-  if (!formRef.value) return
-  
+  if (!formRef.value) return;
+
   try {
-    await formRef.value.validate()
-    
+    await formRef.value.validate();
+
     if (formData.id) {
-      await projectApi.update(formData)
-      ElMessage.success('更新成功')
+      await projectApi.update(formData);
+      ElMessage.success("更新成功");
     } else {
-      await projectApi.add(formData)
-      ElMessage.success('新增成功')
+      await projectApi.add(formData);
+      ElMessage.success("新增成功");
     }
-    
-    dialogVisible.value = false
-    fetchData()
+
+    dialogVisible.value = false;
+    fetchData();
   } catch (error) {
     if (error !== false) {
-      ElMessage.error(formData.id ? '更新失败' : '新增失败')
+      ElMessage.error(formData.id ? "更新失败" : "新增失败");
     }
   }
-}
+};
 
 const resetForm = () => {
-  formData.id = null
-  formData.name = ''
-  formData.description = ''
-  formData.gitUrl = ''
-  formData.techStack = ''
-  formData.status = 'developing'
-  formData.onlineUrl = ''
-  formData.docUrl = ''
-  formRef.value?.clearValidate()
-}
+  formData.id = null;
+  formData.name = "";
+  formData.description = "";
+  formData.gitUrl = "";
+  formData.techStack = "";
+  formData.status = "developing";
+  formData.onlineUrl = "";
+  formData.docUrl = "";
+  formRef.value?.clearValidate();
+};
 
 const handleSizeChange = (val) => {
-  pagination.pageSize = val
-  fetchData()
-}
+  pagination.pageSize = val;
+  fetchData();
+};
 
 const handleCurrentChange = (val) => {
-  pagination.pageNum = val
-  fetchData()
-}
+  pagination.pageNum = val;
+  fetchData();
+};
 
 onMounted(() => {
-  fetchData()
-})
+  fetchData();
+});
 </script>
 
 <style scoped lang="scss">
@@ -430,7 +535,7 @@ onMounted(() => {
     td {
       background: transparent;
       border-bottom: 1px solid #2c2d31;
-      color: #e5e5e5;
+      color: #000000;
     }
 
     tr:hover > td {
@@ -444,6 +549,79 @@ onMounted(() => {
     &:hover {
       color: #ffed4e;
     }
+  }
+
+  .link-text {
+    color: #ffd700;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      color: #ffed4e;
+      text-decoration: underline;
+    }
+  }
+
+  .empty-text {
+    color: #8e8e93;
+  }
+
+  .name-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .name-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ffd700;
+  }
+
+  .name-link {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ffd700;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      color: #ffed4e;
+      text-decoration: underline;
+    }
+  }
+
+  /* 通用的省略样式，用于表格内超长文本显示省略号并在悬浮时由 tooltip 展示完整内容 */
+  .ellipsis {
+    display: inline-block;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &:deep(
+    .el-table__column--selection > .cell,
+    .el-table__column--index > .cell,
+    .el-table__column[data-property="name"] > .cell
+  ) {
+    text-align: center;
   }
 }
 
