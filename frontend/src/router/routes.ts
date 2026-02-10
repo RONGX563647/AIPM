@@ -77,6 +77,15 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/ai-review',
+    name: 'AiReview',
+    component: () => import('@/views/ai-review/index.vue'),
+    meta: {
+      title: 'AI代码评审',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/monitoring',
     name: 'Monitoring',
     component: () => import('@/views/monitoring/index.vue'),
@@ -109,6 +118,15 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/views/test/index.vue'),
     meta: {
       title: '自动化接口测试',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/visualization-demo',
+    name: 'VisualizationDemo',
+    component: () => import('@/views/visualization-demo.vue'),
+    meta: {
+      title: '可视化组件演示',
       requiresAuth: false
     }
   },

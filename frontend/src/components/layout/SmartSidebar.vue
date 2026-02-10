@@ -161,6 +161,13 @@ const menuItems = computed(() => [
     roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
   },
   {
+    index: 'ai-review',
+    icon: DocumentChecked,
+    title: 'AI代码评审',
+    path: '/ai-review',
+    roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
+  },
+  {
     index: 'monitoring',
     icon: Monitor,
     title: '系统监控',
