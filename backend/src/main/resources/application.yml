@@ -1,0 +1,57 @@
+# Spring Boot Application Configuration
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_SERVLET_CONTEXT_PATH:/api}
+
+# Database Configuration
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:30000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:120000}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
+    open-in-view: ${SPRING_JPA_OPEN_IN_VIEW:false}
+
+# MyBatis-Plus Configuration
+mybatis-plus:
+  mapper-locations: ${MYBATIS_PLUS_MAPPER_LOCATIONS:classpath*:mapper/**/*.xml}
+  type-aliases-package: ${MYBATIS_PLUS_TYPE_ALIASES_PACKAGE:com.rongx.entity}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics}
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS:when_authorized}
+
+# Logging Configuration
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.rongx: ${LOGGING_LEVEL_COM_RONGX:DEBUG}
+
+# JWT 配置
+jwt:
+  secret: ${JWT_SECRET:ai-code-review-secret-key-2024}
+  expiration: ${JWT_EXPIRATION:86400000}
