@@ -1,28 +1,26 @@
 import api from './auth.api'
 
-export interface Deploy {
+export interface DeployRecord {
   id?: number
   projectId: number
-  deployType: string
   version: string
-  environment: string
+  env: string
   status: string
-  operator: string
-  startTime?: string
-  endTime?: string
-  logs?: string
+  content?: string
+  createTime?: string
 }
 
 export interface DeployPageRequest {
   pageNum?: number
   pageSize?: number
   projectId?: number
-  environment?: string
+  env?: string
   status?: string
+  version?: string
 }
 
 export interface DeployPageResponse {
-  records: Deploy[]
+  records: DeployRecord[]
   total: number
   size: number
   current: number
@@ -30,23 +28,19 @@ export interface DeployPageResponse {
 }
 
 export const deployApi = {
-  add: (data: Deploy) => {
-    return api.post('/deploy', data)
+  add: (data: DeployRecord) => {
+    return api.post<DeployRecord>('/deploy/add', data)
   },
 
-  update: (data: Deploy) => {
-    return api.put('/deploy', data)
+  update: (data: DeployRecord) => {
+    return api.put<DeployRecord>('/deploy/update', data)
   },
 
   delete: (id: number) => {
-    return api.delete(`/deploy/${id}`)
+    return api.delete(`/deploy/delete/${id}`)
   },
 
   page: (params: DeployPageRequest) => {
     return api.get<DeployPageResponse>('/deploy/page', { params })
-  },
-
-  getById: (id: number) => {
-    return api.get<Deploy>(`/deploy/${id}`)
   }
 }

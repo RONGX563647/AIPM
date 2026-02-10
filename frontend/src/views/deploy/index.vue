@@ -11,31 +11,51 @@
     <div class="deploy-content">
       <el-card class="search-card">
         <el-form :model="searchForm" inline>
-          <el-form-item label="环境">
+          <el-form-item label="关联项目">
             <el-select
-              v-model="searchForm.environment"
+              v-model="searchForm.projectId"
+              placeholder="请选择项目"
+              clearable
+              class="search-select"
+            >
+              <el-option
+                v-for="project in projects"
+                :key="project.id"
+                :label="project.name"
+                :value="project.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="部署环境">
+            <el-select
+              v-model="searchForm.env"
               placeholder="请选择环境"
               clearable
               class="search-select"
             >
               <el-option label="开发" value="dev" />
               <el-option label="测试" value="test" />
-              <el-option label="预发" value="staging" />
               <el-option label="生产" value="prod" />
             </el-select>
           </el-form-item>
-          <el-form-item label="状态">
+          <el-form-item label="部署状态">
             <el-select
               v-model="searchForm.status"
               placeholder="请选择状态"
               clearable
               class="search-select"
             >
-              <el-option label="待部署" value="pending" />
-              <el-option label="部署中" value="deploying" />
-              <el-option label="已完成" value="completed" />
-              <el-option label="失败" value="failed" />
+              <el-option label="成功" value="success" />
+              <el-option label="失败" value="fail" />
             </el-select>
+          </el-form-item>
+          <el-form-item label="版本号">
+            <el-input
+              v-model="searchForm.version"
+              placeholder="请输入版本号"
+              clearable
+              class="search-input"
+            />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="handleSearch" class="gold-button">
@@ -58,37 +78,38 @@
           stripe
           class="deploy-table"
         >
-          <el-table-column prop="version" label="版本" min-width="120" />
-          <el-table-column prop="deployType" label="部署类型" width="120">
+          <el-table-column prop="version" label="版本号" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="env" label="部署环境" width="100">
             <template #default="{ row }">
-              {{ getDeployTypeText(row.deployType) }}
+              <el-tag :type="getEnvType(row.env)" size="small">
+                {{ getEnvText(row.env) }}
+              </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="environment" label="环境" width="100">
-            <template #default="{ row }">
-              {{ getEnvironmentText(row.environment) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="状态" width="100">
+          <el-table-column prop="status" label="部署状态" width="100">
             <template #default="{ row }">
               <el-tag :type="getStatusType(row.status)" size="small">
                 {{ getStatusText(row.status) }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="operator" label="操作人" width="120" />
-          <el-table-column prop="startTime" label="开始时间" width="200" />
-          <el-table-column prop="endTime" label="结束时间" width="200" />
-          <el-table-column label="操作" width="150" fixed="right">
+          <el-table-column prop="content" label="部署内容" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="createTime" label="部署时间" width="180">
+            <template #default="{ row }">
+              <span v-if="row.createTime">{{ formatDate(row.createTime) }}</span>
+              <span v-else class="empty-text">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
               <el-button
                 type="primary"
                 link
-                @click="handleEdit(row)"
+                @click="handleView(row)"
                 class="action-button"
               >
-                <el-icon><Edit /></el-icon>
-                编辑
+                <el-icon><View /></el-icon>
+                查看详情
               </el-button>
               <el-button
                 type="danger"
@@ -128,47 +149,43 @@
         :rules="formRules"
         label-width="100px"
       >
-        <el-form-item label="项目ID" prop="projectId">
-          <el-input v-model="formData.projectId" placeholder="请输入项目ID" />
-        </el-form-item>
-        <el-form-item label="部署类型" prop="deployType">
-          <el-select v-model="formData.deployType" placeholder="请选择部署类型" style="width: 100%">
-            <el-option label="全量" value="full" />
-            <el-option label="增量" value="incremental" />
+        <el-form-item label="关联项目" prop="projectId">
+          <el-select v-model="formData.projectId" placeholder="请选择项目" style="width: 100%" :disabled="isView">
+            <el-option
+              v-for="project in projects"
+              :key="project.id"
+              :label="project.name"
+              :value="project.id"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item label="版本" prop="version">
-          <el-input v-model="formData.version" placeholder="请输入版本号" />
+        <el-form-item label="版本号" prop="version">
+          <el-input v-model="formData.version" placeholder="请输入版本号" :disabled="isView" />
         </el-form-item>
-        <el-form-item label="环境" prop="environment">
-          <el-select v-model="formData.environment" placeholder="请选择环境" style="width: 100%">
+        <el-form-item label="部署环境" prop="env">
+          <el-select v-model="formData.env" placeholder="请选择环境" style="width: 100%" :disabled="isView">
             <el-option label="开发" value="dev" />
             <el-option label="测试" value="test" />
-            <el-option label="预发" value="staging" />
             <el-option label="生产" value="prod" />
           </el-select>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%">
-            <el-option label="待部署" value="pending" />
-            <el-option label="部署中" value="deploying" />
-            <el-option label="已完成" value="completed" />
-            <el-option label="失败" value="failed" />
+        <el-form-item label="部署状态" prop="status">
+          <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%" :disabled="isView">
+            <el-option label="成功" value="success" />
+            <el-option label="失败" value="fail" />
           </el-select>
         </el-form-item>
-        <el-form-item label="操作人" prop="operator">
-          <el-input v-model="formData.operator" placeholder="请输入操作人" />
-        </el-form-item>
-        <el-form-item label="部署日志" prop="logs">
+        <el-form-item label="部署内容">
           <el-input
-            v-model="formData.logs"
+            v-model="formData.content"
             type="textarea"
             :rows="4"
-            placeholder="请输入部署日志"
+            placeholder="请输入部署内容"
+            :disabled="isView"
           />
         </el-form-item>
       </el-form>
-      <template #footer>
+      <template #footer v-if="!isView">
         <el-button @click="dialogVisible = false" class="cancel-button">取消</el-button>
         <el-button type="primary" @click="handleSubmit" class="gold-button">确定</el-button>
       </template>
@@ -177,20 +194,24 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, RefreshLeft, Edit, Delete } from '@element-plus/icons-vue'
+import { Plus, Search, RefreshLeft, View, Delete } from '@element-plus/icons-vue'
 import { deployApi } from '@/api/deploy.api'
+import { projectApi } from '@/api/project.api'
 
 const loading = ref(false)
 const tableData = ref([])
+const projects = ref([])
 const dialogVisible = ref(false)
-const dialogTitle = ref('新增部署')
 const formRef = ref(null)
+const isView = ref(false)
 
 const searchForm = reactive({
-  environment: '',
-  status: ''
+  projectId: null,
+  env: '',
+  status: '',
+  version: ''
 })
 
 const pagination = reactive({
@@ -201,49 +222,45 @@ const pagination = reactive({
 
 const formData = reactive({
   id: null,
-  projectId: 1,
-  deployType: 'full',
+  projectId: null,
   version: '',
-  environment: 'dev',
-  status: 'pending',
-  operator: '',
-  logs: ''
+  env: '',
+  status: '',
+  content: ''
 })
 
 const formRules = {
   projectId: [
-    { required: true, message: '请输入项目ID', trigger: 'blur' }
-  ],
-  deployType: [
-    { required: true, message: '请选择部署类型', trigger: 'change' }
+    { required: true, message: '请选择项目', trigger: 'change' }
   ],
   version: [
     { required: true, message: '请输入版本号', trigger: 'blur' }
   ],
-  environment: [
-    { required: true, message: '请选择环境', trigger: 'change' }
+  env: [
+    { required: true, message: '请选择部署环境', trigger: 'change' }
   ],
   status: [
-    { required: true, message: '请选择状态', trigger: 'change' }
-  ],
-  operator: [
-    { required: true, message: '请输入操作人', trigger: 'blur' }
+    { required: true, message: '请选择部署状态', trigger: 'change' }
   ]
 }
 
-const getDeployTypeText = (type) => {
-  const textMap = {
-    full: '全量',
-    incremental: '增量'
+const dialogTitle = computed(() => {
+  return isView.value ? '查看详情' : '新增部署'
+})
+
+const getEnvType = (env) => {
+  const typeMap = {
+    dev: 'info',
+    test: 'warning',
+    prod: 'danger'
   }
-  return textMap[type] || type
+  return typeMap[env] || 'info'
 }
 
-const getEnvironmentText = (env) => {
+const getEnvText = (env) => {
   const textMap = {
     dev: '开发',
     test: '测试',
-    staging: '预发',
     prod: '生产'
   }
   return textMap[env] || env
@@ -251,22 +268,40 @@ const getEnvironmentText = (env) => {
 
 const getStatusType = (status) => {
   const typeMap = {
-    pending: 'info',
-    deploying: 'warning',
-    completed: 'success',
-    failed: 'danger'
+    success: 'success',
+    fail: 'danger'
   }
   return typeMap[status] || 'info'
 }
 
 const getStatusText = (status) => {
   const textMap = {
-    pending: '待部署',
-    deploying: '部署中',
-    completed: '已完成',
-    failed: '失败'
+    success: '成功',
+    fail: '失败'
   }
   return textMap[status] || status
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}`
+}
+
+const fetchProjects = async () => {
+  try {
+    const res = await projectApi.page({ pageNum: 1, pageSize: 100 })
+    if (res.code === 0) {
+      projects.value = res.data.records
+    }
+  } catch (error) {
+    console.error('获取项目列表失败', error)
+  }
 }
 
 const fetchData = async () => {
@@ -275,11 +310,12 @@ const fetchData = async () => {
     const res = await deployApi.page({
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize,
-      projectId: formData.projectId,
-      environment: searchForm.environment || undefined,
-      status: searchForm.status || undefined
+      projectId: searchForm.projectId || undefined,
+      env: searchForm.env || undefined,
+      status: searchForm.status || undefined,
+      version: searchForm.version || undefined
     })
-    if (res.code === 200) {
+    if (res.code === 0) {
       tableData.value = res.data.records
       pagination.total = res.data.total
     }
@@ -296,21 +332,28 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  searchForm.environment = ''
+  searchForm.projectId = null
+  searchForm.env = ''
   searchForm.status = ''
+  searchForm.version = ''
   pagination.pageNum = 1
   fetchData()
 }
 
 const handleAdd = () => {
-  dialogTitle.value = '新增部署'
   resetForm()
+  isView.value = false
   dialogVisible.value = true
 }
 
-const handleEdit = (row) => {
-  dialogTitle.value = '编辑部署'
-  Object.assign(formData, row)
+const handleView = (row) => {
+  formData.id = row.id
+  formData.projectId = row.projectId
+  formData.version = row.version
+  formData.env = row.env
+  formData.status = row.status
+  formData.content = row.content
+  isView.value = true
   dialogVisible.value = true
 }
 
@@ -337,32 +380,26 @@ const handleSubmit = async () => {
   try {
     await formRef.value.validate()
     
-    if (formData.id) {
-      await deployApi.update(formData)
-      ElMessage.success('更新成功')
-    } else {
-      await deployApi.add(formData)
+    const res = await deployApi.add(formData)
+    if (res.code === 0) {
       ElMessage.success('新增成功')
+      dialogVisible.value = false
+      fetchData()
     }
-    
-    dialogVisible.value = false
-    fetchData()
   } catch (error) {
     if (error !== false) {
-      ElMessage.error(formData.id ? '更新失败' : '新增失败')
+      ElMessage.error('新增失败')
     }
   }
 }
 
 const resetForm = () => {
   formData.id = null
-  formData.projectId = 1
-  formData.deployType = 'full'
+  formData.projectId = null
   formData.version = ''
-  formData.environment = 'dev'
-  formData.status = 'pending'
-  formData.operator = ''
-  formData.logs = ''
+  formData.env = ''
+  formData.status = ''
+  formData.content = ''
   formRef.value?.clearValidate()
 }
 
@@ -377,6 +414,7 @@ const handleCurrentChange = (val) => {
 }
 
 onMounted(() => {
+  fetchProjects()
   fetchData()
 })
 </script>
@@ -446,7 +484,8 @@ onMounted(() => {
     margin-bottom: 16px;
   }
 
-  .search-select {
+  .search-select,
+  .search-input {
     width: 200px;
 
     &:deep(.el-input__wrapper) {
@@ -488,6 +527,10 @@ onMounted(() => {
     tr:hover > td {
       background: rgba(255, 215, 0, 0.05);
     }
+  }
+
+  .empty-text {
+    color: #8e8e93;
   }
 
   .action-button {
@@ -570,21 +613,7 @@ onMounted(() => {
       color: #e5e5e5;
     }
 
-    .el-input__wrapper {
-      background: #2c2d31;
-      border: 1px solid #4a4b4f;
-      color: #e5e5e5;
-
-      &:hover {
-        border-color: #ffd700;
-      }
-
-      &.is-focus {
-        border-color: #ffd700;
-        box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
-      }
-    }
-
+    .el-input__wrapper,
     .el-textarea__inner {
       background: #2c2d31;
       border: 1px solid #4a4b4f;
@@ -594,7 +623,7 @@ onMounted(() => {
         border-color: #ffd700;
       }
 
-      &:focus {
+      &.is-focus {
         border-color: #ffd700;
         box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
       }
