@@ -151,6 +151,20 @@ CREATE INDEX idx_deploy_record_env ON deploy_record(env);
 CREATE INDEX idx_deploy_record_status ON deploy_record(status);
 CREATE INDEX idx_deploy_record_version ON deploy_record(version);
 
+-- 模块9：数据中心（data_metric）
+CREATE TABLE data_metric (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    value DECIMAL(20, 2) NOT NULL,
+    unit VARCHAR(50) DEFAULT '',
+    category VARCHAR(50) DEFAULT '',
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_data_metric_category ON data_metric(category);
+CREATE INDEX idx_data_metric_name ON data_metric(name);
+CREATE INDEX idx_data_metric_timestamp ON data_metric(timestamp);
+
 -- 插入初始测试数据
 -- 1. 插入一个测试用户
 INSERT INTO sys_user (username, password, nickname) 
@@ -183,6 +197,19 @@ FROM project WHERE name = 'AI研发大脑平台';
 INSERT INTO deploy_record (project_id, version, content, env, status)
 SELECT id, 'v1.0.0', '初始版本发布', 'dev', 'success'
 FROM project WHERE name = 'AI研发大脑平台';
+
+-- 7. 为数据中心插入测试数据
+INSERT INTO data_metric (name, value, unit, category, timestamp) VALUES
+('系统CPU使用率', 45.5, '%', 'system', CURRENT_TIMESTAMP - INTERVAL '5 minutes'),
+('系统内存使用率', 62.3, '%', 'system', CURRENT_TIMESTAMP - INTERVAL '10 minutes'),
+('系统磁盘使用率', 78.2, '%', 'system', CURRENT_TIMESTAMP - INTERVAL '15 minutes'),
+('API响应时间', 120, 'ms', 'performance', CURRENT_TIMESTAMP - INTERVAL '3 minutes'),
+('数据库连接数', 25, '个', 'system', CURRENT_TIMESTAMP - INTERVAL '8 minutes'),
+('今日活跃用户', 1250, '人', 'business', CURRENT_TIMESTAMP - INTERVAL '1 minute'),
+('今日订单数', 342, '单', 'business', CURRENT_TIMESTAMP - INTERVAL '2 minutes'),
+('系统负载', 1.2, '', 'system', CURRENT_TIMESTAMP - INTERVAL '4 minutes'),
+('网络带宽使用', 85.6, 'Mbps', 'performance', CURRENT_TIMESTAMP - INTERVAL '6 minutes'),
+('错误率', 0.05, '%', 'performance', CURRENT_TIMESTAMP - INTERVAL '7 minutes');
 
 -- 查看表结构验证
 SELECT 
