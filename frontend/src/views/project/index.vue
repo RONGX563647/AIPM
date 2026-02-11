@@ -63,8 +63,9 @@
                 >
                   <template v-if="row.gitUrl">
                     <a
-                      :href="row.gitUrl"
+                      :href="formatUrl(row.gitUrl)"
                       target="_blank"
+                      rel="noopener noreferrer"
                       class="name-link ellipsis"
                       >{{ row.name }}</a
                     >
@@ -103,8 +104,9 @@
                   :disabled="!row.onlineUrl || row.onlineUrl.length <= 30"
                 >
                   <a
-                    :href="row.onlineUrl"
+                    :href="formatUrl(row.onlineUrl)"
                     target="_blank"
+                    rel="noopener noreferrer"
                     class="link-text ellipsis"
                   >
                     {{ row.onlineUrl }}
@@ -123,8 +125,9 @@
                   :disabled="!row.docUrl || row.docUrl.length <= 30"
                 >
                   <a
-                    :href="row.docUrl"
+                    :href="formatUrl(row.docUrl)"
                     target="_blank"
+                    rel="noopener noreferrer"
                     class="link-text ellipsis"
                   >
                     {{ row.docUrl }}
@@ -319,6 +322,14 @@ const formatDate = (dateStr) => {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+};
+
+const formatUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return url.startsWith('//') ? `https:${url}` : `https://${url}`;
 };
 
 const fetchData = async () => {

@@ -1,5 +1,16 @@
 <template>
   <div class="login-container">
+    <!-- 背景可视化 -->
+    <div class="login-background">
+      <VisualizationController 
+        :default-visualization="'galaxy-map'"
+        :show-controls="false"
+        :auto-switch="true"
+        :switch-interval="8000"
+        class="background-visualization"
+      />
+    </div>
+    
     <div class="login-form-wrapper">
       <div class="login-header">
         <h1 class="login-title">AI全自动研发大脑</h1>
@@ -88,7 +99,6 @@
       </el-form>
 
       <div class="login-footer">
-        <p class="login-tip">默认账号：admin / 密码：123456</p>
         <div class="login-links">
           <el-button type="text" @click="navigateToRegister" class="footer-link"
             >注册账号</el-button
@@ -112,6 +122,7 @@ import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { authApi } from "@/api/auth.api";
 import { useUserStore } from '@/stores/user';
+import VisualizationController from '@/components/visualization/VisualizationController.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -209,10 +220,29 @@ const navigateToForgotPassword = () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0.1;
+}
+
+.background-visualization {
+  width: 100%;
+  height: 100%;
 }
 
 .login-form-wrapper {
-  background: rgba(26, 27, 30, 0.8);
+  position: relative;
+  z-index: 2;
+  background: rgba(26, 27, 30, 0.1);
   border-radius: 16px;
   padding: 48px;
   width: 100%;

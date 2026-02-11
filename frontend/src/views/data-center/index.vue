@@ -290,6 +290,7 @@ onMounted(() => {
         color: #ffd700;
         font-weight: bold;
         border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        font-family: 'SimHei', '黑体', sans-serif;
       }
     }
 
@@ -298,6 +299,7 @@ onMounted(() => {
         background: transparent;
         border-bottom: 1px solid #2c2d31;
         color: #000000;
+        font-family: 'SimHei', '黑体', sans-serif;
       }
 
       tr:hover > td {
@@ -316,6 +318,7 @@ onMounted(() => {
           color: #ffd700;
           font-weight: bold;
           border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+          font-family: 'SimHei', '黑体', sans-serif;
         }
       }
 
@@ -323,7 +326,8 @@ onMounted(() => {
         td {
           background: transparent;
           border-bottom: 1px solid #2c2d31;
-          color: #e5e5e5;
+          color: #000000;
+          font-family: 'SimHei', '黑体', sans-serif;
         }
 
         tr:hover > td {
