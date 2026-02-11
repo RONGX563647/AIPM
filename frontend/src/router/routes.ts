@@ -68,15 +68,6 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/code-review',
-    name: 'CodeReview',
-    component: () => import('@/views/code-review/index.vue'),
-    meta: {
-      title: '代码评审',
-      requiresAuth: false
-    }
-  },
-  {
     path: '/ai-review',
     name: 'AiReview',
     component: () => import('@/views/ai-review/index.vue'),

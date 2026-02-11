@@ -1,5 +1,16 @@
 <template>
   <div class="home-container">
+    <!-- 背景可视化 -->
+    <div class="home-background">
+      <VisualizationController 
+        :default-visualization="'code-universe'"
+        :show-controls="false"
+        :auto-switch="true"
+        :switch-interval="12000"
+        class="background-visualization"
+      />
+    </div>
+    
     <div class="home-content">
       <div class="welcome-section">
         <h1 class="welcome-title">欢迎回来，{{ username }}</h1>
@@ -26,10 +37,10 @@
             <h3 class="feature-title">接口中心</h3>
             <p class="feature-description">管理和调试API接口</p>
           </div>
-          <div class="feature-item" @click="navigateToCodeReview">
+          <div class="feature-item" @click="navigateToAiReview">
             <el-icon class="feature-icon"><DocumentChecked /></el-icon>
-            <h3 class="feature-title">代码评审</h3>
-            <p class="feature-description">评审代码质量和安全性</p>
+            <h3 class="feature-title">AI代码评审</h3>
+            <p class="feature-description">AI智能评审代码质量和安全性</p>
           </div>
           <div class="feature-item" @click="navigateToMonitoring">
             <el-icon class="feature-icon"><Monitor /></el-icon>
@@ -60,7 +71,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Management, Document, Files, Monitor, DocumentChecked, DataAnalysis, Box } from '@element-plus/icons-vue'
+import { Management, Document, Files, Monitor, DocumentChecked, DataAnalysis, Box, Check } from '@element-plus/icons-vue'
+import VisualizationController from '@/components/visualization/VisualizationController.vue'
 
 const router = useRouter()
 const username = ref('管理员')
@@ -77,8 +89,8 @@ const navigateToApiInfo = () => {
   router.push('/api-info')
 }
 
-const navigateToCodeReview = () => {
-  router.push('/code-review')
+const navigateToAiReview = () => {
+  router.push('/ai-review')
 }
 
 const navigateToMonitoring = () => {
@@ -108,9 +120,28 @@ onMounted(() => {
   background: linear-gradient(135deg, #111113 0%, #1A1B1E 100%);
   color: #E5E5E5;
   padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0.1;
+}
+
+.background-visualization {
+  width: 100%;
+  height: 100%;
 }
 
 .home-content {
+  position: relative;
+  z-index: 2;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -137,7 +168,7 @@ onMounted(() => {
 }
 
 .home-card {
-  background: rgba(26, 27, 30, 0.6);
+  background: rgba(26, 27, 30, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 32px;
@@ -165,7 +196,7 @@ onMounted(() => {
 }
 
 .feature-item {
-  background: rgba(44, 45, 49, 0.6);
+  background: rgba(44, 45, 49, 0.1);
   border-radius: 8px;
   padding: 24px;
   text-align: center;
