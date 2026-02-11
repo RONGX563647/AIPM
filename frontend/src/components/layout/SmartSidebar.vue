@@ -100,7 +100,8 @@ import {
   Bell,
   SwitchButton,
   Lock,
-  Unlock
+  Unlock,
+  Refresh
 } from '@element-plus/icons-vue'
 
 const emit = defineEmits(['update:collapsed'])
@@ -160,6 +161,7 @@ const menuItems = computed(() => [
     path: '/ai-review',
     roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
   },
+  
   {
     index: 'monitoring',
     icon: Monitor,
@@ -180,6 +182,13 @@ const menuItems = computed(() => [
     title: '部署记录',
     path: '/deploy',
     roles: ['ADMIN', 'SUPER_ADMIN'] // 仅管理员可访问
+  },
+  {
+    index: 'sync',
+    icon: Refresh,
+    title: '数据同步',
+    path: '/sync',
+    roles: ['USER', 'ADMIN', 'SUPER_ADMIN']
   }
 ])
 
@@ -228,11 +237,11 @@ const handleMenuSelect = (index) => {
 }
 
 const handleSettings = () => {
-  ElMessage.info('设置功能开发中')
+  router.push('/setting')
 }
 
 const handleNotification = () => {
-  ElMessage.info('通知功能开发中')
+  router.push('/notification')
 }
 
 const handleLogout = () => {

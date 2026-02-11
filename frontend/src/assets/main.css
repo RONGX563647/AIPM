@@ -101,6 +101,23 @@ img {
   color: var(--color-info);
 }
 
+/* 全局样式，用于处理AI侧边栏打开时主内容区域的调整 */
+body.ai-sidebar-open .main-content {
+  margin-right: 400px !important; /* 确保覆盖其他样式 */
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body:not(.ai-sidebar-open) .main-content {
+  margin-right: 0 !important;
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+  body.ai-sidebar-open .main-content {
+    margin-right: 0 !important; /* 在小屏幕上不预留空间 */
+  }
+}
+
 .bg-glass {
   background: var(--gradient-glass);
   backdrop-filter: var(--backdrop-blur-md);

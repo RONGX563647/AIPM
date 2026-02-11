@@ -3,8 +3,11 @@
   /* 黑色系 */
   --color-primary-black: #111113;
   --color-secondary-black: #1A1B1E;
+  --color-tertiary-black: #2C2D31;
   --color-dark-gray: #2C2D31;
+  --color-border: #4A4B4F;
   --color-medium-gray: #4A4B4F;
+  --color-hover: #3C3D41;
   --color-light-gray: #8E8E93;
   --color-ultra-light-gray: #F2F2F7;
   
@@ -13,7 +16,8 @@
   --color-gold-light: #FFED4E;
   --color-gold-dark: #B38B2D;
   --color-gold-darker: #8B6914;
-  --color-gold-glass: rgba(255, 215, 0, 0.1);
+  --color-gold-glass: rgba(255, 215, 0, 0.4);
+  --color-gold-primary-glow: rgba(255, 215, 0, 0.6);
   
   /* 功能色 */
   --color-success: #34C759;

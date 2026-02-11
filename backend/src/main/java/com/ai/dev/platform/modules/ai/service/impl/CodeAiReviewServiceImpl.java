@@ -39,7 +39,7 @@ public class CodeAiReviewServiceImpl extends ServiceImpl<CodeAiReviewMapper, Cod
         Random random = new Random();
         review.setScore(80 + random.nextInt(16));
         
-        review.setSuggestion("1. 建议优化代码结构，提高可读性\n" +
+        review.setSuggestion("1. 建议优化代码结构，提高可读性\n" +    
                 "2. 添加必要的注释说明关键逻辑\n" +
                 "3. 考虑使用更高效的算法\n" +
                 "4. 增加异常处理机制");

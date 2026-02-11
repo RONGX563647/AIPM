@@ -122,11 +122,47 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/ai-assistant',
+    name: 'AIAssistant',
+    component: () => import('@/views/ai-assistant/index.vue'),
+    meta: {
+      title: 'AI助手',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/sync',
+    name: 'Sync',
+    component: () => import('@/views/sync/index.vue'),
+    meta: {
+      title: '数据同步',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/visualization-demo',
     name: 'VisualizationDemo',
     component: () => import('@/views/visualization-demo.vue'),
     meta: {
       title: '可视化组件演示',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/setting',
+    name: 'Setting',
+    component: () => import('@/views/setting/UserSetting.vue'),
+    meta: {
+      title: '用户设置',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: () => import('@/views/setting/Notification.vue'),
+    meta: {
+      title: '通知中心',
       requiresAuth: false
     }
   },
