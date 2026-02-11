@@ -297,7 +297,7 @@ onMounted(() => {
       td {
         background: transparent;
         border-bottom: 1px solid #2c2d31;
-        color: #e5e5e5;
+        color: #000000;
       }
 
       tr:hover > td {
